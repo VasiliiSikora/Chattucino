@@ -1,10 +1,103 @@
-from flask import Flask
+from crypt import methods
+from email.policy import default
+from flask import Flask, render_template, redirect, request, session
+import psycopg2
+import bcrypt
+import requests
+import os
+from functions import db_selector, db_inserter, cookie_get
+
+#import config vars from heroku
+DB_URL = os.environ.get('DATABASE_URL', 'dbname=chattucino')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'pretend secret key for testing')
+
+#when want to push local db to heroku: heroku pf:push database_name_here DATABASE_URL
+#heroku psql to update stuff in the heroku app
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = SECRET_KEY
 
 @app.route('/')
 def index():
-    return 'Hello world!'
+    # conn = psycopg2.connect(DB_URL)
+    # cur = conn.cursor()
+    # cur.execute('SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id') #Pull post data
+    # results = cur.fetchall()
+    results = db_selector(DB_URL, 'SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id')
+    posts = []
+    for row in results:
+        post = {
+            'post_id': row[0],
+            'name': row[2],
+            'fav_coffee': row[3],
+            'location': row[4],
+            'flair': row[5],
+            'date': row[6],
+            'max_people': row[7]
+        }
+        posts.append(post)
+    print(posts)
+    # conn.close()
+    user_cookie = cookie_get(DB_URL)
+
+    return render_template('home.html', posts = posts, user_cookie = user_cookie)
+
+@app.route('/new_post')
+def new_post():
+    return render_template('new_post.html')
+
+@app.route('/new_post_action', methods=['POST'])
+def new_post_action():
+    return redirect('/')
+
+@app.route('/signup')
+def signup():
+    return render_template('sign_up.html')
+
+@app.route('/signup_action', methods=['POST'])
+def signup_action():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    pw_confirm = request.form.get('confirm')
+    fav_coffee = request.form.get('fav_coffee')
+    default_beans = 0
+    if password == pw_confirm and name!=None and password != None and email != None and fav_coffee != None:
+        hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    else: 
+        return render_template('failed.html')
+    db_inserter(DB_URL, 'INSERT INTO users(name, password, email, fav_coffee,beans) VALUES (%s, %s, %s, %s, %s)',[name, hashed_pw, email, fav_coffee, default_beans])
+    return redirect('/')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/login_action', methods=['POST'])
+def login_action():
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    results = db_selector(DB_URL, f"SELECT * FROM users WHERE email LIKE '{email}'")
+    if results != []:
+        password_hash = results[0][2]
+        pw_check = bcrypt.checkpw(password.encode(), password_hash.encode())
+    else:
+        return render_template('failed.html')        
+
+    if results != [] and email in results[0] and pw_check:
+        id = results[0][0]
+        session['user_id'] = id
+        print(session['user_id'])
+        return redirect('/')
+    else:
+        return render_template('failed.html')
+
+@app.route('/logout')
+def delete_cookie():
+    for key in list(session.keys()):
+        session.pop(key)
+    return redirect('/')
 
 #Important for Heroku to work:
 if __name__ == "__main__":

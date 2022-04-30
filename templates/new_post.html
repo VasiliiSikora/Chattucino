@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <a href="/">Return home</a>
+    <div>
+        <h2>Create Chattucino</h2>
+        <form action="/new_post" method="POST">
+            <input type="hidden" name="id">
+            <div>
+                Name: <input name="name" type="text">
+            </div>
+            <div>
+                Location: <input name="location" type="text">
+            </div>
+            <div>
+                Date: <input name="date" type="date">
+            </div>
+            <div>
+                Max Number of People: <input name="max_people" type="number">
+            </div>
+            <div>
+                Flair:
+                <select name="flair" id="flair">
+                    <option value="Just Chat">Just Chat</option>
+                    <option value="Date">Date</option>
+                    <option value="Language Exchange">Language Exchange</option>
+                    <option value="Study">Study</option>
+                </select>
+            </div>
+            <input type="submit" value="Post Chat">
+        </form>
+    </div>
+
+{% endblock %}

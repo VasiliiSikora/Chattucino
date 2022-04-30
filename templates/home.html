@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% for post in posts %}
+        <div class="post">
+            <div class="title">
+                <span class="flair {{ post['flair'].replace(' ', '_') }}">{{ post['flair'] }}</span>
+                <p>X/{{ post['max_people'] }} Keen as a Bean</p>
+            </div>
+            <div class="content">
+                <p>{{ post['name'] }}:</p>
+                <span class="details">
+                    #Chattucino at {{ post['location'] }} on {{ post['date'] }}
+                </span>
+            </div>
+            <div>
+                <span class="weather">
+                    Weather: WEATHER
+                </span>
+            </div>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}

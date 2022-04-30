@@ -1,0 +1,59 @@
+body {
+    background-color: #F4DFBA;
+}
+
+.post {
+    background-color: #EEC373;
+    width: 440px;
+    border: 1px solid #876445;
+    box-shadow: 0 0 5px #CA965C;
+    padding: 10px;
+}
+
+.title {
+    display: flex;
+    justify-content: space-between;
+}
+
+.title p {
+    margin: 0;
+}
+
+.content {
+    display: flex;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.content p {
+    margin: 0 5px 0 0;
+}
+
+/* .flair {
+    background-color: rgba(255, 0, 0, 0.3);
+} */
+
+#app_heading {
+    font-family: 'Cookie', cursive;
+}
+
+img {
+    width: 40px;
+}
+
+/* Flair Stylers */
+.Just_Chat {
+    background-color: rgba(255, 0, 0, 0.3);
+}
+
+.Date {
+    background-color: rgba(255, 0, 246, 0.3);
+}
+
+.Language_Exchange {
+    background-color: rgba(0, 21, 255, 0.3);
+}
+
+.Study {
+    background-color: rgba(34, 255, 0, 0.3);
+}
