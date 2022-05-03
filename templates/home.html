@@ -6,19 +6,30 @@
         <div class="post">
             <div class="title">
                 <span class="flair {{ post['flair'].replace(' ', '_') }}">{{ post['flair'] }}</span>
-                <p>X/{{ post['max_people'] }} Keen as a Bean</p>
+                <p>0/{{ post['max_people'] }} Keen as a Bean</p>
             </div>
             <div class="content">
-                <p>{{ post['name'] }}:</p>
-                <span class="details">
-                    #Chattucino at {{ post['location'] }} on {{ post['date'] }}
-                </span>
+                <p class="username">{{ post['name'] }}:</p>
+                <p class="details">
+                    <span>#Chattucino</span> at <span>{{ post['location'] }}</span> on <span>{{ post['date'] }}</span>
+                </p>
             </div>
-            <div>
-                <span class="weather">
-                    Weather: WEATHER
-                </span>
+            {% if post['date']>today %}
+                <div>
+                    <p class="weather">
+                        <span>Weather:</span> <img src="{{ post['icon'] }}" alt="" class="weather_icon"> {{ post['weather'] }} {{ post['temperature'] }}&#176;C 
+                    </p>
+                </div>
+            {% endif %}
+            <div class="clickables">
+                <a href="/post_detail?post_id={{ post['post_id'] }}">More Detail...</a>
+                {% if post['date']>today %}
+                    <form action="/request_to_go" class="interested">
+                        <input type="submit" value="I'm Interested" />
+                    </form>
+                {% endif %}
             </div>
+
         </div>
     {% endfor %}
 

@@ -2,4 +2,24 @@
 
 {% block content %}
 
+<div class="post">
+    <div class="title">
+        <span class="flair {{ post['flair'].replace(' ', '_') }}">{{ post['flair'] }}</span>
+        <p>X/{{ post['max_people'] }} Keen as a Bean</p>
+    </div>
+    <div class="content">
+        <p class="username">{{ post['name'] }}:</p>
+        <p class="details">
+            <span>#Chattucino</span> at <span>{{ post['location'] }}</span> on <span>{{ post['date'] }}</span>
+        </p>
+    </div>
+    <div>
+        <p class="weather">
+            <span>Weather:</span> <img src="{{ post['icon'] }}" alt="" class="weather_icon"> {{ post['weather'] }} {{ post['temperature'] }}&#176;C 
+        </p>
+    </div>
+    <img src="{{ map_url }}" alt="" id="map">
+    
+</div>
+
 {% endblock %}

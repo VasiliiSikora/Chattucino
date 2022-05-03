@@ -1,8 +1,17 @@
-KEY = '96617311f71c4bf3b0d44922223004'
-# API_URL = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&units=metric&appid={KEY}'
+from map import location_get
+import json
+import requests
 
-location = 'Kensington'
-date = '2022-05-02'
+def weather_get(location):
+    [latitude, longitude] = location_get(location)
+    KEY = '8af340833e58a324b6848fbbe2296849'
+    lat = latitude
+    lon = longitude
+    part = 'minutely,hourly,alerts'
+    API_URL_json = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&units=metric&appid={KEY}'
 
-API_URL= f'http://api.weatherapi.com/v1/forecast.json?key={KEY}?q={location}?dt={date}'
-print(API_URL)
+    response = requests.get(API_URL_json)
+    data=json.loads(response.text)
+
+    return data
+

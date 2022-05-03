@@ -4,13 +4,24 @@
     <a href="/">Return home</a>
     <div>
         <h2>Create Chattucino</h2>
-        <form action="/new_post" method="POST">
+        <form action="/new_post_action" method="POST">
             <input type="hidden" name="id">
             <div>
-                Name: <input name="name" type="text">
-            </div>
-            <div>
-                Location: <input name="location" type="text">
+                Street: <input name="street_address" type="text">
+                <br>
+                Suburb: <input name="location" type="text">
+                <br>
+                State: 
+                <select name="state">
+                    <option value="Victoria">VIC</option>
+                    <option value="Tasmania">TAS</option>
+                    <option value="ACT">ACT</option>
+                    <option value="South Australia">SA</option>
+                    <option value="Western Australia">WA</option>
+                    <option value="Northern Territory">NT</option>
+                    <option value="Queensland">QLD</option>
+                    <option value="New South Wales">NSW</option>
+                </select>
             </div>
             <div>
                 Date: <input name="date" type="date">

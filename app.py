@@ -1,11 +1,19 @@
 from crypt import methods
 from email.policy import default
-from flask import Flask, render_template, redirect, request, session
+from flask import Flask, render_template, redirect, request, session, jsonify
 import psycopg2
 import bcrypt
 import requests
 import os
-from functions import db_selector, db_inserter, cookie_get
+from functions import convert_unix_time, db_selector, db_inserter, cookie_get
+from datetime import datetime, date
+
+from map import location_get, static_map_get
+from weather import weather_get
+
+#convert UNIX time to YYYY-MM-DD
+ts = int('1651370400')
+print(datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d'))
 
 #import config vars from heroku
 DB_URL = os.environ.get('DATABASE_URL', 'dbname=chattucino')
@@ -19,6 +27,9 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 @app.route('/')
 def index():
+    today = datetime.today().strftime('%Y-%m-%d')
+    print(today)
+    today_compare = datetime.strptime(today, '%Y-%m-%d').date()
     # conn = psycopg2.connect(DB_URL)
     # cur = conn.cursor()
     # cur.execute('SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id') #Pull post data
@@ -35,23 +46,55 @@ def index():
             'date': row[6],
             'max_people': row[7]
         }
-        posts.append(post)
+        
+        #deal with weather
+        if post['date']>today_compare:
+            weather_json = weather_get(post['location'])
+            weather_results = weather_json['daily']
+            for row in weather_results:
+                date = convert_unix_time(row['dt'])
+                if str(date) == str(post['date']):
+                    post['temperature'] = row['temp']['day']
+                    post['weather'] = row['weather'][0]['main']
+                    icon = row['weather'][0]['icon']
+                    post['icon'] = f'http://openweathermap.org/img/wn/{icon}@2x.png'
+
+            posts.append(post)
+
     print(posts)
     # conn.close()
     user_cookie = cookie_get(DB_URL)
 
-    return render_template('home.html', posts = posts, user_cookie = user_cookie)
+    return render_template('home.html', posts = posts, user_cookie = user_cookie, today=today_compare)
 
 @app.route('/new_post')
 def new_post():
-    return render_template('new_post.html')
+    user_cookie = cookie_get(DB_URL)
+    return render_template('new_post.html', user_cookie=user_cookie)
 
 @app.route('/new_post_action', methods=['POST'])
 def new_post_action():
-    return redirect('/')
+    user_id = session.get('user_id')
+    street_address = request.form.get('street_address')
+    location = request.form.get('location')
+    state = request.form.get('state')
+    date = request.form.get('date')
+    max_people = request.form.get('max_people')
+    flair = request.form.get('flair')
+    if user_id == None:
+        return redirect('/')
+    if user_id!=None and street_address!=None and location!=None and state!=None and date!=None and max_people!=None and flair!=None:
+        db_inserter(DB_URL, 'INSERT INTO posts(user_id, street_address, location, state,date, max_people, flair) VALUES (%s, %s, %s, %s, %s, %s, %s)',[user_id, street_address, location, state,date, max_people, flair])
+
+        return redirect('/')
+    else:
+        return render_template('failed.html')
 
 @app.route('/signup')
 def signup():
+    user_cookie = cookie_get(DB_URL)
+    if user_cookie == None:
+        return redirect('/')
     return render_template('sign_up.html')
 
 @app.route('/signup_action', methods=['POST'])
@@ -98,6 +141,42 @@ def delete_cookie():
     for key in list(session.keys()):
         session.pop(key)
     return redirect('/')
+
+@app.route('/post_detail')
+def more_detail():
+    user_cookie = cookie_get(DB_URL)
+    post_id=request.args.get('post_id')
+    results = db_selector(DB_URL, f'SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people, street_address, state FROM posts INNER JOIN users ON users.user_id = posts.user_id WHERE posts.post_id = {post_id}')
+
+    for row in results:
+        post = {
+            'post_id': row[0],
+            'name': row[2],
+            'fav_coffee': row[3],
+            'location': row[4],
+            'flair': row[5],
+            'date': row[6],
+            'max_people': row[7],
+            'street_address': row[8],
+            'state': row[9]
+        }
+
+        #deal with weather
+        weather_json = weather_get(f"{post['street_address']}, {post['location']}, {post['state']} Australia")
+        weather_results = weather_json['daily']
+        for row in weather_results:
+            date = convert_unix_time(row['dt'])
+            if str(date) == str(post['date']):
+                post['temperature'] = row['temp']['day']
+                post['weather'] = row['weather'][0]['main']
+                icon = row['weather'][0]['icon']
+                post['icon'] = f'http://openweathermap.org/img/wn/{icon}@2x.png'
+
+        #Need to resolve search query by having more detailed location
+        map_url = static_map_get(f"{post['street_address']}, {post['location']}, {post['state']} Australia")
+
+    return render_template('post_detail.html', post=post, map_url=map_url, user_cookie=user_cookie)
+
 
 #Important for Heroku to work:
 if __name__ == "__main__":

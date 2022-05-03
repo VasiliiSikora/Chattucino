@@ -1,10 +1,10 @@
 import psycopg2
 from flask import session
+from datetime import datetime
 
 def db_selector(dbname, query):
     conn = psycopg2.connect(dbname)
     cur = conn.cursor() 
-    print(query)
     cur.execute(query)
     results = cur.fetchall()
     conn.close()
@@ -29,3 +29,9 @@ def cookie_get(dbname):
         user_cookie = results[0][0]
     conn.close()
     return user_cookie
+
+
+def convert_unix_time(unix):
+    ts = int(unix)
+    YYYYMMDD = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d')
+    return YYYYMMDD

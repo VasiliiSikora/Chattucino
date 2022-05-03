@@ -14,12 +14,16 @@ CREATE TABLE users (
 CREATE TABLE posts (
     post_id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(user_id),
+    street_address TEXT,
     location TEXT,
+    state TEXT,
     flair TEXT,
     date DATE,
     max_people INTEGER
 );
 
-CREATE TABLE going (
-
+CREATE TABLE interested (
+    post_id INTEGER REFERENCES posts(post_id),
+    interested_user INTEGER REFERENCES users(user_id),
+    going VARCHAR(1)
 );
