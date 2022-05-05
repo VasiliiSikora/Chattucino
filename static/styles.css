@@ -6,9 +6,54 @@ body {
     align-items: center;
 }
 
+a {
+    text-decoration: none;
+}
+
 header {
     width: 100vw;
     text-align: center;
+}
+
+#base_header {
+    display: grid;
+    border-bottom: 2px solid #876445;
+    grid-template-columns: 1fr 4fr 1fr;
+}
+
+#base_header div {
+    align-self: center;
+}
+
+#base_header div p {
+    font-family: 'Cookie', cursive;
+    color: #894c15;
+    font-size: 25px;
+}
+
+#base_header div p a {
+    font-family: 'Roboto', sans-serif;
+    padding: 10px;
+    text-decoration: none;
+    /* color: #000000; */
+    border-radius: 5px;
+    margin: 0 10px;
+    background-color: #CA965C;
+    text-decoration: none;
+    color: #F4DFBA;
+    font-size: 20px;
+}
+
+#app_heading {
+    font-family: 'Cookie', cursive;
+    color: #894c15;
+    font-size: 45px;
+    margin: 10px auto 0 auto;
+    padding-bottom: 5px;
+}
+
+#app_heading a:visited {
+    color: #894c15;
 }
 
 #logo {
@@ -20,13 +65,19 @@ header {
 .post {
     /* background-color: #EEC373; */
     background-color: #f2e6d2;
+    font-family: 'Roboto', sans-serif;
     width: 440px;
     border: 1px solid #876445;
     box-shadow: 0 0 5px #CA965C;
-    padding: 10px;
+    /* padding: 10px; */
     margin: 10px 0;
     border-radius: 10px;
-    font-family: 'Roboto', sans-serif;
+
+}
+
+.post div {
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .post .clickables {
@@ -42,6 +93,7 @@ header {
 .title {
     display: flex;
     justify-content: space-between;
+    padding-top: 10px;
 }
 
 .title p, .weather {
@@ -52,10 +104,16 @@ header {
     display: flex;
     margin-top: 10px;
     margin-bottom: 5px;
+    padding-top: 10px;
+}
+.weather_div {
+    padding-top: 5px;
 }
 
 .content p {
     margin: 0 5px 0 0;
+    vertical-align: middle;
+    line-height: 0;
 }
 
 .weather_icon {
@@ -63,30 +121,52 @@ header {
     vertical-align: middle;
 }
 
+#interest {
+    font-family: 'Cookie', cursive;
+    font-size: 25px;
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+.interested {
+    padding-top: 5px;
+    padding-bottom: 0px;
+    margin-top:0px;
+    margin-bottom: 0px;
+}
+
+#interested_div {
+    margin-bottom:10px;
+}
+
+.button {
+    padding-top:0px;
+    padding-bottom: 10px;
+    margin-top:0px;
+    margin-bottom: 0px;
+}
+
 /* .details span {
     font-weight: bold;
 } */
 
 .username {
-    font-weight: bolder;
+    font-weight: normal;
+    font-size: 22px;
+    font-family: 'Cookie', cursive;
 }
 
 #map {
-    width: 400px;
-    border: 2px solid #CA965C;
+    width: 100%;
+    border-top: 1px solid #CA965C;
+    border-bottom: 1px solid #CA965C;
 }
 
 /* .flair {
     background-color: rgba(255, 0, 0, 0.3);
 } */
 
-#app_heading {
-    font-family: 'Cookie', cursive;
-    font-size: 45px;
-    border-bottom: 2px solid #876445;
-    margin: 10px auto 0 auto;
-    padding-bottom: 5px;
-}
+
 
 img {
     width: 40px;
@@ -94,16 +174,158 @@ img {
 
 footer {
     color: rgb(89, 89, 89);
-    position: fixed;
-    bottom: 20px;
+    margin: 10px auto auto auto;
+    /* position: absolute; */
+    bottom: 0;
+    width: 100%;
+    height: 2.5rem; 
+    text-align: center;
 }
 
 #copyright {
     text-decoration: underline;
+    font-family: 'Cookie', cursive;
+    font-size: 18px;
 
 }
 
+/* User Profile */
+#details {
+    border:#876445 1px solid;
+    border-radius: 10px;
+    background-color: #f2e6d2;
+    font-family: 'Roboto', sans-serif;
+}
+#personal_details {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+    padding-top: 5px;
+    border-bottom: black solid 1px;
+}
 
+/* --- */
+#second_heading {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    padding-bottom: 10px;
+    margin-bottom: 0px;
+
+}
+#front_page {
+    font-family: 'Roboto', sans-serif;
+    padding: 0 50px 0 25px;
+    max-width: 536px;
+}
+#front_logo {
+    font-family: 'Cookie', cursive;
+    color: #894c15;
+    font-size: 58px;
+}
+
+#front_img {
+    width: 400px;
+    padding-right: 50px;
+}
+
+#front_body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#descript {
+    font-size: 20px;
+    margin-top: 0px;
+    padding-top: 0px;
+}
+#front_header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #876445;
+    padding-bottom: 5px;
+    font-family: 'Roboto', sans-serif;
+    align-items: center;
+}
+
+#front_heading {
+    font-family: 'Cookie', cursive;
+    font-size: 45px;
+    margin: 0px auto 0 10px;
+}
+#steps_img {
+    width: 100px;
+}
+.head_button {
+    padding: 10px;
+    text-decoration: none;
+    color: #000000;
+    border-radius: 5px;
+    margin: 0 10px;
+}
+#front_join {
+    margin: 30px 0px;
+    background-color: #CA965C;
+    text-decoration: none;
+    color: #F4DFBA;
+    border-radius: 5px;
+}
+/* --- */
+
+#personal_details p {
+    margin: 0;
+}
+
+#update {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 8px;
+}
+
+.about {
+    width: 400px;
+    margin-top: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 8px;
+
+}
+
+#signup_form div {
+    display: flex;
+    justify-content: space-between;
+}
+#signup_form div input {
+    margin-left: 10px;
+}
+#signup_box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#signup_button {
+    justify-content: center;
+}
+
+#new_form div {
+    display: flex;
+    justify-content: space-between;
+}
+#new_form div input {
+    margin-left: 10px;
+}
+#new_box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#new_button {
+    justify-content: center;
+}
 
 /* Flair Stylers */
 .Just_Chat {

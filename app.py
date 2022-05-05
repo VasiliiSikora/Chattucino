@@ -1,5 +1,6 @@
 from crypt import methods
 from email.policy import default
+import re
 from flask import Flask, render_template, redirect, request, session, jsonify
 import psycopg2
 import bcrypt
@@ -28,7 +29,6 @@ app.config['SECRET_KEY'] = SECRET_KEY
 @app.route('/')
 def index():
     today = datetime.today().strftime('%Y-%m-%d')
-    print(today)
     today_compare = datetime.strptime(today, '%Y-%m-%d').date()
     # conn = psycopg2.connect(DB_URL)
     # cur = conn.cursor()
@@ -46,7 +46,6 @@ def index():
             'date': row[6],
             'max_people': row[7]
         }
-        
         #deal with weather
         if post['date']>today_compare:
             weather_json = weather_get(post['location'])
@@ -59,11 +58,17 @@ def index():
                     icon = row['weather'][0]['icon']
                     post['icon'] = f'http://openweathermap.org/img/wn/{icon}@2x.png'
 
-            posts.append(post)
+        posts.append(post)
 
-    print(posts)
+        #Check for interested/going users
+        interested = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'))")
+        post['interested'] = interested[0][0]
     # conn.close()
     user_cookie = cookie_get(DB_URL)
+    print(user_cookie)
+
+    if user_cookie==None:
+        return render_template('frontpage.html')
 
     return render_template('home.html', posts = posts, user_cookie = user_cookie, today=today_compare)
 
@@ -93,9 +98,9 @@ def new_post_action():
 @app.route('/signup')
 def signup():
     user_cookie = cookie_get(DB_URL)
-    if user_cookie == None:
+    if user_cookie != None:
         return redirect('/')
-    return render_template('sign_up.html')
+    return render_template('sign_up.html', user_cookie=user_cookie)
 
 @app.route('/signup_action', methods=['POST'])
 def signup_action():
@@ -144,6 +149,8 @@ def delete_cookie():
 
 @app.route('/post_detail')
 def more_detail():
+    today = datetime.today().strftime('%Y-%m-%d')
+    today_compare = datetime.strptime(today, '%Y-%m-%d').date()
     user_cookie = cookie_get(DB_URL)
     post_id=request.args.get('post_id')
     results = db_selector(DB_URL, f'SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people, street_address, state FROM posts INNER JOIN users ON users.user_id = posts.user_id WHERE posts.post_id = {post_id}')
@@ -175,8 +182,94 @@ def more_detail():
         #Need to resolve search query by having more detailed location
         map_url = static_map_get(f"{post['street_address']}, {post['location']}, {post['state']} Australia")
 
-    return render_template('post_detail.html', post=post, map_url=map_url, user_cookie=user_cookie)
+        interested = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'))")
+        post['interested'] = interested[0][0]
+        users_interested = db_selector(DB_URL,f"SELECT name FROM interested INNER JOIN users ON users.user_id=interested.interested_user WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'));")
+        print(users_interested)
 
+    return render_template('post_detail.html', post=post, map_url=map_url, user_cookie=user_cookie, users_interested=users_interested,today=today_compare)
+
+@app.route('/request_to_go', methods=['POST'])
+def register_interest():
+    user_cookie = session['user_id']
+    post_id=request.form.get('post_id')
+    user_check = db_selector(DB_URL,f'SELECT * FROM interested WHERE (post_id={post_id} AND interested_user = {user_cookie})')
+    if user_check == []:
+        pending = "P"
+        db_inserter(DB_URL,'INSERT INTO interested(post_id,interested_user, going) VALUES (%s, %s, %s)',[post_id, user_cookie, pending])
+    return redirect('/')
+
+@app.route('/user')
+def user_profile():
+    today = datetime.today().strftime('%Y-%m-%d')
+    today_compare = datetime.strptime(today, '%Y-%m-%d').date()
+    user_page = request.args.get('id')
+    user_id = session['user_id']
+    # conn = psycopg2.connect(DB_URL)
+    # cur = conn.cursor()
+    # cur.execute('SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id') #Pull post data
+    # results = cur.fetchall()
+    user_details = db_selector(DB_URL, f'SELECT name, about, hometown, age FROM user_page INNER JOIN users ON user_page.user_id=users.user_id WHERE user_page.user_id={user_page}')
+
+    for row in user_details:
+        profile_info = {
+            'name': row[0],
+            'about': row[1],
+            'hometown': row[2],
+            'age': row[3]
+        }
+
+    results = db_selector(DB_URL, f'SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id WHERE posts.user_id={user_page}')
+    posts = []
+    interest_list = []
+    for row in results:
+        post = {
+            'post_id': row[0],
+            'name': row[2],
+            'fav_coffee': row[3],
+            'location': row[4],
+            'flair': row[5],
+            'date': row[6],
+            'max_people': row[7]
+        }
+        
+        #deal with weather
+        if post['date']>today_compare:
+            weather_json = weather_get(post['location'])
+            weather_results = weather_json['daily']
+            for row in weather_results:
+                date = convert_unix_time(row['dt'])
+                if str(date) == str(post['date']):
+                    post['temperature'] = row['temp']['day']
+                    post['weather'] = row['weather'][0]['main']
+                    icon = row['weather'][0]['icon']
+                    post['icon'] = f'http://openweathermap.org/img/wn/{icon}@2x.png'
+
+            posts.append(post)
+
+        #Check for interested/going users
+        interested = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'))")
+        post['interested'] = interested[0][0]
+
+        interested = db_selector(DB_URL,f"SELECT name, users.user_id FROM interested INNER JOIN users ON interested.interested_user=users.user_id WHERE (post_id={post['post_id']} AND going='P')")
+
+        for entry in interested:
+            interest = {
+                'name': entry[0],
+                'user_id':entry[1]
+            }
+            interest_list.append(interest)
+
+    print(interest_list)
+
+    # conn.close()
+    user_cookie = cookie_get(DB_URL)
+
+    return render_template('user_profile.html', posts = posts, user_cookie = user_cookie, today=today_compare, id=int(user_page), profile_info=profile_info, user_id=user_id)
+
+@app.route('/test')
+def test():
+    return render_template('frontpage.html')
 
 #Important for Heroku to work:
 if __name__ == "__main__":

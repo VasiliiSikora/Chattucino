@@ -14,23 +14,33 @@
     <title>Chattucino</title>
 </head>
 <body>
-    <header>
+    <header id="base_header">
+        <div>
+            {% if user_cookie != None %}
+                <p>{{ user_cookie }}</p>
+            {% endif %}
+        </div>
         <h1 id="app_heading">
-            <img src="/static/chattucino_logo.png" alt="" id="logo">
-            Chattucino
+            <a href="/">
+                <img src="/static/chattucino_logo.png" alt="" id="logo">
+                Chattucino
+            </a>
         </h1>
-        {% if user_cookie != None %}
-            <p>Logged in as {{ user_cookie }} <a href="/logout">Logout</a></p>
-        {% else %}
-            <a href="/login">Log In</a>
-        {% endif %}
+        <div>
+            {% if user_cookie != None %}
+                <p><a href="/logout">Logout</a></p>
+            {% endif %}
+        </div>
+
     </header>
 
     {% block content %}
 
-    {% endblock %}
+    {% endblock %}    
+
+
+    <footer>
+        Copyright © <span id="copyright">Chattucino</span> 2022.
+    </footer>
 </body>
-<footer>
-    Copyright © <span id="copyright">Chattucino</span> 2022.
-</footer>
 </html>

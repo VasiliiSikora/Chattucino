@@ -2,15 +2,17 @@
 
 {% block content %}
     <a href="/">Return home</a>
-    <div>
+    <div id="new_box">
         <h2>Create Chattucino</h2>
-        <form action="/new_post_action" method="POST">
+        <form action="/new_post_action" method="POST" id="new_form">
             <input type="hidden" name="id">
             <div>
                 Street: <input name="street_address" type="text">
-                <br>
+            </div>
+            <div>
                 Suburb: <input name="location" type="text">
-                <br>
+            </div>
+            <div>
                 State: 
                 <select name="state">
                     <option value="Victoria">VIC</option>
@@ -38,7 +40,12 @@
                     <option value="Study">Study</option>
                 </select>
             </div>
-            <input type="submit" value="Post Chat">
+            <div id="new_button">
+                <br>
+                <input type="submit" value="Post Chat">
+                <br>
+            </div>
+           
         </form>
     </div>
 

@@ -3,9 +3,9 @@
 {% block content %}
 
     <a href="/">Return home</a>
-    <div>
-        <h2>Create an Account</h2>
-        <form action="/login_action" method="POST">
+    <div id="new_box">
+        <h2>Login</h2>
+        <form action="/login_action" method="POST" id="new_form">
             <input type="hidden" name="id">
             <div>
                 Email: <input name="email" type="text">
@@ -13,7 +13,12 @@
             <div>
                 Password: <input name="password" type="text">
             </div>
-            <input type="submit" value="Login">
+            <div id="new_button">
+                <br>
+                <input type="submit" value="Login">
+                <br>
+            </div>
+
         </form>
     </div>
 

@@ -27,3 +27,10 @@ CREATE TABLE interested (
     interested_user INTEGER REFERENCES users(user_id),
     going VARCHAR(1)
 );
+
+CREATE TABLE user_page (
+    user_id INTEGER REFERENCES users(user_id),
+    about TEXT,
+    hometown TEXT,
+    age INTEGER
+);

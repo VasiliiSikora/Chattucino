@@ -6,7 +6,9 @@
         <div class="post">
             <div class="title">
                 <span class="flair {{ post['flair'].replace(' ', '_') }}">{{ post['flair'] }}</span>
-                <p>0/{{ post['max_people'] }} Keen as a Bean</p>
+                {% if post['date']>today %}
+                    <p>{{ post['interested'] }} Keen as a Bean</p>
+                {% endif %}
             </div>
             <div class="content">
                 <p class="username">{{ post['name'] }}:</p>
@@ -15,16 +17,17 @@
                 </p>
             </div>
             {% if post['date']>today %}
-                <div>
+                <div style="padding-top: 5px;">
                     <p class="weather">
                         <span>Weather:</span> <img src="{{ post['icon'] }}" alt="" class="weather_icon"> {{ post['weather'] }} {{ post['temperature'] }}&#176;C 
                     </p>
                 </div>
             {% endif %}
             <div class="clickables">
-                <a href="/post_detail?post_id={{ post['post_id'] }}">More Detail...</a>
-                {% if post['date']>today %}
-                    <form action="/request_to_go" class="interested">
+                <a href="/post_detail?post_id={{ post['post_id'] }}" style="padding-bottom: -3px;position: relative;bottom: -4px;font-size: 15px;">More Detail...</a>
+                {% if post['date']>today and user_cookie!=None %}
+                    <form action="/request_to_go" class="button" method="POST">
+                        <input type="hidden" name="post_id" value="{{ post['post_id'] }}">
                         <input type="submit" value="I'm Interested" />
                     </form>
                 {% endif %}
