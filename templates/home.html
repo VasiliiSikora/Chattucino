@@ -2,6 +2,8 @@
 
 {% block content %}
 
+<a href="/new_post" id="new_post">Brew a new Chattucino</a>
+
     {% for post in posts %}
         <div class="post">
             <div class="title">
@@ -11,13 +13,13 @@
                 {% endif %}
             </div>
             <div class="content">
-                <p class="username">{{ post['name'] }}:</p>
+                <a href="/user?id={{ post['user_id'] }}" class="username">{{ post['name'] }}:</a>
                 <p class="details">
                     <span>#Chattucino</span> at <span>{{ post['location'] }}</span> on <span>{{ post['date'] }}</span>
                 </p>
             </div>
             {% if post['date']>today %}
-                <div style="padding-top: 5px;">
+                <div>
                     <p class="weather">
                         <span>Weather:</span> <img src="{{ post['icon'] }}" alt="" class="weather_icon"> {{ post['weather'] }} {{ post['temperature'] }}&#176;C 
                     </p>

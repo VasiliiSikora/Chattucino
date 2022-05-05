@@ -28,17 +28,22 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 @app.route('/')
 def index():
+    user_cookie = cookie_get(DB_URL)
+
+    if user_cookie==None:
+        return render_template('frontpage.html')
     today = datetime.today().strftime('%Y-%m-%d')
     today_compare = datetime.strptime(today, '%Y-%m-%d').date()
     # conn = psycopg2.connect(DB_URL)
     # cur = conn.cursor()
     # cur.execute('SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id') #Pull post data
     # results = cur.fetchall()
-    results = db_selector(DB_URL, 'SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id')
+    results = db_selector(DB_URL, 'SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id ORDER BY post_id DESC')
     posts = []
     for row in results:
         post = {
             'post_id': row[0],
+            'user_id': row[1],
             'name': row[2],
             'fav_coffee': row[3],
             'location': row[4],
@@ -64,13 +69,10 @@ def index():
         interested = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'))")
         post['interested'] = interested[0][0]
     # conn.close()
-    user_cookie = cookie_get(DB_URL)
-    print(user_cookie)
 
-    if user_cookie==None:
-        return render_template('frontpage.html')
+    user_id=session.get('user_id')
 
-    return render_template('home.html', posts = posts, user_cookie = user_cookie, today=today_compare)
+    return render_template('home.html', posts = posts, user_cookie = user_cookie, today=today_compare, user_id=user_id)
 
 @app.route('/new_post')
 def new_post():
@@ -210,7 +212,7 @@ def user_profile():
     # cur.execute('SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id') #Pull post data
     # results = cur.fetchall()
     user_details = db_selector(DB_URL, f'SELECT name, about, hometown, age FROM user_page INNER JOIN users ON user_page.user_id=users.user_id WHERE user_page.user_id={user_page}')
-
+    profile_info = []
     for row in user_details:
         profile_info = {
             'name': row[0],
@@ -267,9 +269,9 @@ def user_profile():
 
     return render_template('user_profile.html', posts = posts, user_cookie = user_cookie, today=today_compare, id=int(user_page), profile_info=profile_info, user_id=user_id)
 
-@app.route('/test')
-def test():
-    return render_template('frontpage.html')
+@app.route('/update')
+def update():
+    return render_template('update.html')
 
 #Important for Heroku to work:
 if __name__ == "__main__":

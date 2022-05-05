@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div>
+        <h2>Create an Account</h2>
+        <form action="/update_action" method="POST" id="update_form">
+            <input type="hidden" name="id">
+            <div>
+                About: <input name="about" type="text">
+            </div>
+            <div id="update_box">
+                <div>
+                    Hometown: <input name="hometown" type="text">
+                </div>
+                <div>
+                    Age: <input name="age" type="text">
+                </div>
+                <div id="update_button">
+                    <br>
+                    <input type="submit" value="Update" >
+                    <br>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

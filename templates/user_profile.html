@@ -10,11 +10,13 @@
     </div>
     <p class="about">{{ profile_info['about'] }}</p>
     {% if user_id == id %}
-        <form action="/update_profile" method="GET" id="update">
+        <form action="/update" method="GET" id="update">
             <input type="submit" value="Update Profile">
         </form>
     {% endif %}
 </div>
+
+
 
 {% for post in posts %}
         <div class="post">

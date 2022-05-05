@@ -10,6 +10,21 @@ a {
     text-decoration: none;
 }
 
+#new_post {
+    font-family: 'Cookie', cursive;
+    padding: 10px;
+    text-decoration: none;
+    /* color: #000000; */
+    border-radius: 5px;
+    margin: 10px 10px;
+    background-color: #f2e6d2;
+    text-decoration: none;
+    border: 2px solid #876445;
+    box-shadow: 0 0 5px #CA965C;
+    color: #876445;
+    font-size: 30px;
+}
+
 header {
     width: 100vw;
     text-align: center;
@@ -25,10 +40,11 @@ header {
     align-self: center;
 }
 
-#base_header div p {
+#base_header div a {
     font-family: 'Cookie', cursive;
     color: #894c15;
     font-size: 25px;
+    text-decoration: none;
 }
 
 #base_header div p a {
@@ -41,7 +57,7 @@ header {
     background-color: #CA965C;
     text-decoration: none;
     color: #F4DFBA;
-    font-size: 20px;
+    font-size: 15px;
 }
 
 #app_heading {
@@ -102,18 +118,23 @@ header {
 
 .content {
     display: flex;
-    margin-top: 10px;
-    margin-bottom: 5px;
-    padding-top: 10px;
+    align-items: center;
+    margin-top: 5px;
 }
 .weather_div {
     padding-top: 5px;
 }
 
+.content a {
+    margin: 0 5px 0 0;
+    vertical-align: middle;
+}
+.content a:visited {
+    color: #894c15;
+}
 .content p {
     margin: 0 5px 0 0;
     vertical-align: middle;
-    line-height: 0;
 }
 
 .weather_icon {
@@ -154,6 +175,7 @@ header {
     font-weight: normal;
     font-size: 22px;
     font-family: 'Cookie', cursive;
+    text-decoration: none;
 }
 
 #map {
@@ -324,6 +346,27 @@ footer {
     align-items: center;
 }
 #new_button {
+    justify-content: center;
+}
+
+#update_form div {
+    display: flex;
+    justify-content: space-between;
+}
+#update_form div input {
+    margin-left: 10px;
+}
+#update_box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#update_box div {
+    display: flex;
+    justify-content: space-between;
+}
+#update_button {
     justify-content: center;
 }
 

@@ -17,7 +17,7 @@
     <header id="base_header">
         <div>
             {% if user_cookie != None %}
-                <p>{{ user_cookie }}</p>
+                <a href="/user?id={{ user_id }}">{{ user_cookie }}</a>
             {% endif %}
         </div>
         <h1 id="app_heading">
