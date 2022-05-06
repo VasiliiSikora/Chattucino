@@ -14,8 +14,9 @@ a {
 }
 
 #body_div {
+    padding-top: 30px;
     padding-bottom: 60px;
-    height: 85vh;
+    /* height: 85vh; */
     display: flex;
     justify-content: center;
     flex-direction: column;
