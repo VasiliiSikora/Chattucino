@@ -20,7 +20,7 @@ def location_get(location):
 def static_map_get(location):
     [lat, lon] = location_get(location)
     API_KEY = 'AoqFXS5Ki1QMFt0XF-02zhn_5CJBBSBRy4EHGrPKHBzMe0uQGXT87m1Kp3Hw4xI1'
-    map_URL = f'https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/{lat},{lon}/16?mapSize=400,400&pp={lat},{lon}&key=AoqFXS5Ki1QMFt0XF-02zhn_5CJBBSBRy4EHGrPKHBzMe0uQGXT87m1Kp3Hw4xI1'
+    map_URL = f'https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/{lat},{lon}/16?mapSize=450,400&pp={lat},{lon}&key=AoqFXS5Ki1QMFt0XF-02zhn_5CJBBSBRy4EHGrPKHBzMe0uQGXT87m1Kp3Hw4xI1'
 
     return map_URL
 

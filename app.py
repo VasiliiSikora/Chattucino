@@ -1,6 +1,7 @@
 from crypt import methods
 from email.policy import default
 import re
+from click import pass_context
 from flask import Flask, render_template, redirect, request, session, jsonify
 import psycopg2
 import bcrypt
@@ -58,7 +59,7 @@ def index():
             for row in weather_results:
                 date = convert_unix_time(row['dt'])
                 if str(date) == str(post['date']):
-                    post['temperature'] = row['temp']['day']
+                    post['temperature'] = "{:0.1f}".format(row['temp']['day'])
                     post['weather'] = row['weather'][0]['main']
                     icon = row['weather'][0]['icon']
                     post['icon'] = f'http://openweathermap.org/img/wn/{icon}@2x.png'
@@ -72,6 +73,13 @@ def index():
         going = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='Y'))")  
         if going!=[]:
             post['going'] = going[0][0]  
+
+        #check if user already expressed interest
+        going_check = db_selector(DB_URL,f"SELECT interested_user FROM interested WHERE (post_id={post['post_id']} AND (going='Y' OR going='P'))") 
+        post['going_check'] = []
+        for interested_user in going_check:
+            post['going_check'].append(interested_user[0])
+
     # conn.close()
 
     user_id=session.get('user_id')
@@ -115,9 +123,10 @@ def signup_action():
     email = request.form.get('email')
     password = request.form.get('password')
     pw_confirm = request.form.get('confirm')
+    print(password=='')
     fav_coffee = request.form.get('fav_coffee')
     default_beans = 0
-    if password == pw_confirm and name!=None and password != None and email != None and fav_coffee != None:
+    if password == pw_confirm and name!='' and password != '' and email != '' and fav_coffee != '':
         hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
     else: 
         return render_template('failed.html')
@@ -126,7 +135,8 @@ def signup_action():
 
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    user_cookie = cookie_get(DB_URL)
+    return render_template('login.html', user_cookie=user_cookie)
 
 @app.route('/login_action', methods=['POST'])
 def login_action():
@@ -183,12 +193,11 @@ def more_detail():
         for row in weather_results:
             date = convert_unix_time(row['dt'])
             if str(date) == str(post['date']):
-                post['temperature'] = row['temp']['day']
+                post['temperature'] = "{:0.1f}".format(row['temp']['day'])
                 post['weather'] = row['weather'][0]['main']
                 icon = row['weather'][0]['icon']
                 post['icon'] = f'http://openweathermap.org/img/wn/{icon}@2x.png'
 
-        #Need to resolve search query by having more detailed location
         map_url = static_map_get(f"{post['street_address']}, {post['location']}, {post['state']} Australia")
 
         interested = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'))")
@@ -235,11 +244,6 @@ def user_profile():
     today_compare = datetime.strptime(today, '%Y-%m-%d').date()
     user_page = request.args.get('id')
     user_id = session['user_id']
-    print(user_id, "hello")
-    # conn = psycopg2.connect(DB_URL)
-    # cur = conn.cursor()
-    # cur.execute('SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id') #Pull post data
-    # results = cur.fetchall()
     user_details = db_selector(DB_URL, f'SELECT name, about, hometown, age FROM user_page INNER JOIN users ON user_page.user_id=users.user_id WHERE user_page.user_id={user_page}')
     profile_info = []
     for row in user_details:
@@ -272,7 +276,7 @@ def user_profile():
             for row in weather_results:
                 date = convert_unix_time(row['dt'])
                 if str(date) == str(post['date']):
-                    post['temperature'] = row['temp']['day']
+                    post['temperature'] = "{:0.1f}".format(row['temp']['day'])
                     post['weather'] = row['weather'][0]['main']
                     icon = row['weather'][0]['icon']
                     post['icon'] = f'http://openweathermap.org/img/wn/{icon}@2x.png'
@@ -286,11 +290,14 @@ def user_profile():
         else:
             post['going'] = 0
 
-        interested = db_selector(DB_URL,f"SELECT name, users.user_id FROM interested INNER JOIN users ON interested.interested_user=users.user_id WHERE (post_id={post['post_id']} AND going='P')")
-        if interested!=[]:
-            post['interested'] = interested[0][0]
+
+        interested_users = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'))")
+        if interested_users!=[]:
+            post['interested'] = interested_users[0][0]
         else:
             post['interested'] = 0
+
+        interested = db_selector(DB_URL,f"SELECT name, users.user_id FROM interested INNER JOIN users ON interested.interested_user=users.user_id WHERE (post_id={post['post_id']} AND going='P')")
 
         for entry in interested:
             interest = {
@@ -299,7 +306,12 @@ def user_profile():
             }
             interest_list.append(interest)
 
-    print(interest_list)
+        #check if user already expressed interest
+        going_check = db_selector(DB_URL,f"SELECT interested_user FROM interested WHERE (post_id={post['post_id']} AND (going='Y' OR going='P'))") 
+        post['going_check'] = []
+        for interested_user in going_check:
+            post['going_check'].append(interested_user[0])
+        print(post['going_check'])
 
     # conn.close()
     user_cookie = cookie_get(DB_URL)
@@ -309,7 +321,8 @@ def user_profile():
 @app.route('/update')
 def update():
     user_id=session.get('user_id')
-    return render_template('update.html', user_id=user_id)
+    user_cookie = cookie_get(DB_URL)
+    return render_template('update.html', user_id=user_id, user_cookie=user_cookie)
 
 @app.route('/update_action', methods=["POST"])
 def update_action():
@@ -328,6 +341,11 @@ def approve():
     db_updater(DB_URL, f"UPDATE interested SET going='Y' WHERE interested_user={user_interested}")
 
     return redirect(f'/post_detail?post_id={post_id}')
+
+@app.route('/about')
+def about():
+    user_cookie = cookie_get(DB_URL)
+    return render_template('about.html', user_cookie=user_cookie)
 
 #Important for Heroku to work:
 if __name__ == "__main__":

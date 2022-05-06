@@ -14,3 +14,6 @@ SELECT name, users.user_id FROM interested INNER JOIN users ON interested.intere
 UPDATE posts SET date='2022-05-08' WHERE post_id=1;
 UPDATE posts SET date='2022-05-09' WHERE post_id=2;
 UPDATE posts SET date='2022-05-06' WHERE post_id=3;
+
+UPDATE users SET name='John Smith' WHERE user_id=3;
+UPDATE users SET email='john.smith@emailsite.com' WHERE user_id=3;

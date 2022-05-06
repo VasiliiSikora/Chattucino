@@ -9,13 +9,13 @@
                 Name: <input name="name" type="text">
             </div>
             <div>
-                Email: <input name="email" type="text">
+                Email: <input name="email" type="text" id="signup_email">
             </div>
             <div>
-                Password: <input name="password" type="text">
+                Password: <input name="password" type="password">
             </div>
             <div>
-                Confirm Password: <input name="confirm" type="text">
+                Confirm Password: <input name="confirm" type="password">
             </div>
             <div>
                 Favourite Coffee: <select name="fav_coffee">
@@ -29,9 +29,10 @@
                     <option value="Cold Brew">Cold Brew</option>
                 </select>
             </div>
+            <p id="error" style="color: red;"></p>
             <div id="signup_button">
                 <br>
-                <input type="submit" value="Sign-Up" >
+                <input type="submit" value="Sign-Up" id="signup_disabler">
                 <br>
             </div>
 
