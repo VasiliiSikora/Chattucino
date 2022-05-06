@@ -10,12 +10,14 @@
                 <span class="flair {{ post['flair'].replace(' ', '_') }}">{{ post['flair'] }}</span>
                 {% if post['date']>today %}
                     <p>{{ post['interested'] }} Keen as a Bean</p>
+                {% else %}
+                    <p class="expired">Expired</p>
                 {% endif %}
             </div>
             <div class="content">
                 <a href="/user?id={{ post['user_id'] }}" class="username">{{ post['name'] }}:</a>
                 <p class="details">
-                    <span>#Chattucino</span> at <span>{{ post['location'] }}</span> on <span>{{ post['date'] }}</span>
+                    <span>#Chattucino</span> in <span>{{ post['location'] }}</span> on <span>{{ post['date'] }}</span>
                 </p>
             </div>
             {% if post['date']>today %}
@@ -27,7 +29,7 @@
             {% endif %}
             <div class="clickables">
                 <a href="/post_detail?post_id={{ post['post_id'] }}" style="padding-bottom: -3px;position: relative;bottom: -4px;font-size: 15px;">More Detail...</a>
-                {% if post['date']>today and user_cookie!=None %}
+                {% if post['date']>today and user_cookie!=None and post['user_id']!=user_id and post['max_people']>post['going'] %}
                     <form action="/request_to_go" class="button" method="POST">
                         <input type="hidden" name="post_id" value="{{ post['post_id'] }}">
                         <input type="submit" value="I'm Interested" />

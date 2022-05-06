@@ -6,7 +6,7 @@ import psycopg2
 import bcrypt
 import requests
 import os
-from functions import convert_unix_time, db_selector, db_inserter, cookie_get
+from functions import convert_unix_time, db_selector, db_inserter, cookie_get, db_updater
 from datetime import datetime, date
 
 from map import location_get, static_map_get
@@ -68,6 +68,10 @@ def index():
         #Check for interested/going users
         interested = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'))")
         post['interested'] = interested[0][0]
+
+        going = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='Y'))")  
+        if going!=[]:
+            post['going'] = going[0][0]  
     # conn.close()
 
     user_id=session.get('user_id')
@@ -77,7 +81,8 @@ def index():
 @app.route('/new_post')
 def new_post():
     user_cookie = cookie_get(DB_URL)
-    return render_template('new_post.html', user_cookie=user_cookie)
+    user_id=session.get('user_id')
+    return render_template('new_post.html', user_cookie=user_cookie, user_id=user_id)
 
 @app.route('/new_post_action', methods=['POST'])
 def new_post_action():
@@ -151,6 +156,7 @@ def delete_cookie():
 
 @app.route('/post_detail')
 def more_detail():
+    user_id=session.get('user_id')
     today = datetime.today().strftime('%Y-%m-%d')
     today_compare = datetime.strptime(today, '%Y-%m-%d').date()
     user_cookie = cookie_get(DB_URL)
@@ -160,6 +166,7 @@ def more_detail():
     for row in results:
         post = {
             'post_id': row[0],
+            'user_id': row[1],
             'name': row[2],
             'fav_coffee': row[3],
             'location': row[4],
@@ -185,11 +192,32 @@ def more_detail():
         map_url = static_map_get(f"{post['street_address']}, {post['location']}, {post['state']} Australia")
 
         interested = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'))")
-        post['interested'] = interested[0][0]
-        users_interested = db_selector(DB_URL,f"SELECT name FROM interested INNER JOIN users ON users.user_id=interested.interested_user WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'));")
-        print(users_interested)
+        if interested!=[]:
+            post['interested'] = interested[0][0]
+        else:
+            post['interested'] = 0
+        
+        users_interested = db_selector(DB_URL,f"SELECT name, users.user_id FROM interested INNER JOIN users ON users.user_id=interested.interested_user WHERE (post_id={post['post_id']} AND (going='P'));")
+        users=[]
+        for row in users_interested:
+            user = {
+                'name': row[0],
+                'user_id':row[1]
+            }
+            users.append(user)
 
-    return render_template('post_detail.html', post=post, map_url=map_url, user_cookie=user_cookie, users_interested=users_interested,today=today_compare)
+        users_going = db_selector(DB_URL,f"SELECT name, users.user_id FROM interested INNER JOIN users ON users.user_id=interested.interested_user WHERE (post_id={post['post_id']} AND (going='Y'));")
+        going=[]
+        for row in users_going:
+            user = {
+                'name': row[0],
+                'user_id':row[1]
+            }
+            going.append(user)        
+        
+    print(type(user_id))
+    print(type(post['user_id']))
+    return render_template('post_detail.html', post=post, map_url=map_url, user_cookie=user_cookie, users_interested=users_interested,today=today_compare, user_id=user_id, users=users, going=going)
 
 @app.route('/request_to_go', methods=['POST'])
 def register_interest():
@@ -207,6 +235,7 @@ def user_profile():
     today_compare = datetime.strptime(today, '%Y-%m-%d').date()
     user_page = request.args.get('id')
     user_id = session['user_id']
+    print(user_id, "hello")
     # conn = psycopg2.connect(DB_URL)
     # cur = conn.cursor()
     # cur.execute('SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id') #Pull post data
@@ -221,12 +250,13 @@ def user_profile():
             'age': row[3]
         }
 
-    results = db_selector(DB_URL, f'SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id WHERE posts.user_id={user_page}')
+    results = db_selector(DB_URL, f'SELECT post_id, posts.user_id, name, fav_coffee, location, flair, date, max_people FROM posts INNER JOIN users ON users.user_id = posts.user_id WHERE posts.user_id={user_page} ORDER BY post_id DESC')
     posts = []
     interest_list = []
     for row in results:
         post = {
             'post_id': row[0],
+            'user_id': row[1],
             'name': row[2],
             'fav_coffee': row[3],
             'location': row[4],
@@ -250,10 +280,17 @@ def user_profile():
             posts.append(post)
 
         #Check for interested/going users
-        interested = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='P' OR going='Y'))")
-        post['interested'] = interested[0][0]
+        going = db_selector(DB_URL,f"SELECT COUNT(*) FROM interested WHERE (post_id={post['post_id']} AND (going='Y'))")
+        if going!=[]:
+            post['going'] = going[0][0]
+        else:
+            post['going'] = 0
 
         interested = db_selector(DB_URL,f"SELECT name, users.user_id FROM interested INNER JOIN users ON interested.interested_user=users.user_id WHERE (post_id={post['post_id']} AND going='P')")
+        if interested!=[]:
+            post['interested'] = interested[0][0]
+        else:
+            post['interested'] = 0
 
         for entry in interested:
             interest = {
@@ -271,7 +308,26 @@ def user_profile():
 
 @app.route('/update')
 def update():
-    return render_template('update.html')
+    user_id=session.get('user_id')
+    return render_template('update.html', user_id=user_id)
+
+@app.route('/update_action', methods=["POST"])
+def update_action():
+    user_id=session.get('user_id')
+    about = request.form.get('about')
+    hometown = request.form.get('hometown')
+    age = request.form.get('age')
+    db_inserter(DB_URL,'INSERT INTO user_page(user_id, about, hometown, age) VALUES (%s, %s, %s, %s)',[user_id, about, hometown, age])
+    return redirect(f'/user?{user_id}')
+
+@app.route('/approve', methods=["POST"])
+def approve():
+    post_id=request.form.get('post_id')
+    user_interested=request.form.get('user_interested')
+
+    db_updater(DB_URL, f"UPDATE interested SET going='Y' WHERE interested_user={user_interested}")
+
+    return redirect(f'/post_detail?post_id={post_id}')
 
 #Important for Heroku to work:
 if __name__ == "__main__":

@@ -10,6 +10,14 @@ def db_selector(dbname, query):
     conn.close()
     return results
 
+def db_updater(dbname, query):
+    conn = psycopg2.connect(dbname)
+    cur = conn.cursor() 
+    cur.execute(query)
+    conn.commit()
+    conn.close()
+    return 
+
 def db_inserter(dbname, query, values):
     conn = psycopg2.connect(dbname)
     cur = conn.cursor() 

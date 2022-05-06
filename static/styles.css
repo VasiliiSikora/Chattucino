@@ -4,10 +4,23 @@ body {
     justify-content: center;
     flex-direction: column;
     align-items: center;
+    height: 100%;
+    min-height: 100%;
+    position: relative;
 }
 
 a {
     text-decoration: none;
+}
+
+#body_div {
+    padding-bottom: 60px;
+    height: 85vh;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -20px;
 }
 
 #new_post {
@@ -34,6 +47,8 @@ header {
     display: grid;
     border-bottom: 2px solid #876445;
     grid-template-columns: 1fr 4fr 1fr;
+    min-height: 100%;
+    position: relative;;
 }
 
 #base_header div {
@@ -99,6 +114,7 @@ header {
 .post .clickables {
     display: flex;
     justify-content: space-between;
+    height: 31px;
 }
 
 .post .clickables a {
@@ -154,6 +170,8 @@ header {
     padding-bottom: 0px;
     margin-top:0px;
     margin-bottom: 0px;
+    text-decoration: none;
+    color: black;
 }
 
 #interested_div {
@@ -197,7 +215,8 @@ img {
 footer {
     color: rgb(89, 89, 89);
     margin: 10px auto auto auto;
-    /* position: absolute; */
+    position: absolute;
+    height:30px;
     bottom: 0;
     width: 100%;
     height: 2.5rem; 
@@ -213,6 +232,7 @@ footer {
 
 /* User Profile */
 #details {
+    margin-top: 10px;
     border:#876445 1px solid;
     border-radius: 10px;
     background-color: #f2e6d2;
@@ -385,4 +405,10 @@ footer {
 
 .Study {
     background-color: rgba(34, 255, 0, 0.3);
+}
+
+.expired {
+    color: rgb(255, 0, 0);
+    font-family: 'Cookie', cursive;
+    font-size: 19px;
 }

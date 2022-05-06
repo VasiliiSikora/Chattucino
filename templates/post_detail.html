@@ -7,6 +7,8 @@
         <span class="flair {{ post['flair'].replace(' ', '_') }}">{{ post['flair'] }}</span>
         {% if post['date']>today %}
             <p>{{ post['interested'] }} Keen as a Bean</p>
+        {% else %}
+            <p class="expired">Expired</p>
         {% endif %}
     </div>
     <div class="content">
@@ -23,9 +25,28 @@
     <img src="{{ map_url }}" alt="" id="map">
     <div id="interested_div">
         <h3 id="interest">Espresso'd Interest</h3>
-        {% for name in users_interested[0] %}
-            <p class="interested">{{ name }}</p>
-        {% endfor %}
+        <ul style="margin-top:0px;">
+            {% for user in users %}
+            <li>
+                <a href="user?id={{ user['user_id'] }}"" class="interested">{{ user['name'] }}</a>
+                {% if post['user_id']==user_id %}
+                    <form action="/approve" method="POST">
+                        <input type="hidden" name="user_interested" value="{{ user['user_id'] }}">
+                        <input type="hidden" name="post_id" value="{{ post['post_id'] }}">
+                        <input type="submit" value="Approve" />
+                    </form>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        <h3 id="interest">Going</h3>
+        <ul style="margin-top:0px;">
+            {% for user in going %}
+            <li>
+                <a href="user?id={{ user['user_id'] }}"" class="interested">{{ user['name'] }}</a>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
     
 </div>
