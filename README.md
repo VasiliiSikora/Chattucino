@@ -25,13 +25,13 @@ Chattucino can be expanded for use outside of Australia however, currently Austr
 
 ### Approach Taken
 Broke project down to phases:
-1. Initial Design Concept: core concept mock-up diagram and pseudocode
-2. PostgreSQL Tables: Mock up of 5 tables to achieve functionality outlined in phase 1 with INNER JOINs experimented conceptually
-3. Home Page Front End: Created basic HTML, CSS for layout
-4. Implemented user profiles and signup/login functionality
-5. Jinja Conditionals/Loops: Implemented conditionals and loops in Jinja to display correct data depending on user login
-6. Javascript Implementation: Use of javascript to apply smoother UI experience
-7. Test, Bug-fix & fine-tune: Test several scenarios, fix bugs found in testing and user feedback, fine-tune user experience.
+1. **Initial Design Concept**: core concept mock-up diagram and pseudocode
+2. **PostgreSQL Tables**: Mock up of 5 tables to achieve functionality outlined in phase 1 with INNER JOINs experimented conceptually
+3. **Home Page Front End**: Created basic HTML, CSS for layout
+4. **User Functionality**:Implemented user profiles and signup/login functionality
+5. **Jinja Conditionals/Loops**: Implemented conditionals and loops in Jinja to display correct data depending on user login
+6. **Javascript Implementation**: Use of javascript to apply smoother UI experience
+7. **Test, Bug-fix & fine-tune**: Test several scenarios, fix bugs found in testing and user feedback, fine-tune user experience.
 
 ## Languages & Libraries
 Chattucino utilises Python, HTML, CSS, Javascript and SQL (postgreSQL) languages. 
