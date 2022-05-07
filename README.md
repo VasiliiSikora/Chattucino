@@ -24,8 +24,6 @@ Currently a user can:
 ### **Future Features**
 There is scope to implement AWS S3 to upload and display photos of a meet-up after it has been completed.
 
-Javascript is not currently utilised but can be added to improve usability of the webpages.
-
 Chattucino can be expanded for use outside of Australia however, currently Australia is hardcoded in the app.py file when calling map.py functions.
 
 ### Approach Taken
@@ -39,7 +37,7 @@ Broke project down to phases:
 7. Test, Bug-fix & fine-tune: Test several scenarios, fix bugs found in testing and user feedback, fine-tune user experience.
 
 ## Languages & Libraries
-Chattucino utilises Python, HTML, CSS and SQL (postgreSQL) languages. 
+Chattucino utilises Python, HTML, CSS, Javascript and SQL (postgreSQL) languages. 
 
 Python 3.6 is required.
 
