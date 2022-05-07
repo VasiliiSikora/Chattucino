@@ -11,15 +11,12 @@ Known issues with the applicaiton are also listed at the bottom of this page.
 ## Design
 ### **Current Status**
 Currently a user can:
-    Create an account/Sign Up
-    Login/Logout
-    Post a new "Chattucino" meet-up
-        Location
-        Date
-        Purpose
-    Update user profile details
-    Show interest in attending a meet-up
-    Approve request of other users to join a meet-up
+* Create an account/Sign Up
+* Login/Logout
+* Post a new "Chattucino" meet-up
+* Update user profile details
+* Show interest in attending a meet-up
+* Approve request of other users to join a meet-up
 
 ### **Future Features**
 There is scope to implement AWS S3 to upload and display photos of a meet-up after it has been completed.
