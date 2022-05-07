@@ -331,7 +331,7 @@ def update_action():
     hometown = request.form.get('hometown')
     age = request.form.get('age')
     db_inserter(DB_URL,'INSERT INTO user_page(user_id, about, hometown, age) VALUES (%s, %s, %s, %s)',[user_id, about, hometown, age])
-    return redirect(f'/user?{user_id}')
+    return redirect(f'/user?id={user_id}')
 
 @app.route('/approve', methods=["POST"])
 def approve():
